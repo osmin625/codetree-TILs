@@ -77,26 +77,23 @@ def is_knight(x, y):
 def knight_push_check(i, d, stack):
     dx, dy = dir_[d]
     r, c, h, w, _ = knights[i]
-    wall_flag = False
     knight_flag = False
     for x in range(r, r + h):
         for y in range(c, c + w):
             if knight_board[x + dx][y + dy] == i: # 나라면
                 continue
             elif is_wall(x + dx, y + dy):  # 벽이라면
-                wall_flag = True
+                return []
             elif k:= is_knight(x + dx, y + dy): # 기사라면
                 if k != stack[-1]:
                     stack.append(k)
-                knight_flag = True
+                    knight_flag = True
             else:  # 벽도 아니고 기사도 아니라면
                 continue
-    if not wall_flag:
-        if not knight_flag:
-            return stack
-        else:
-            return knight_push_check(stack[-1], d, stack)
-    return []
+    if not knight_flag:
+        return stack
+    else:
+        return knight_push_check(stack[-1], d, stack)
 
 
 def knight_push(i, d, idx):
