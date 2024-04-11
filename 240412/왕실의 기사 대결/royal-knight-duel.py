@@ -5,7 +5,7 @@ L x L 체스판
 '''
 
 dir_ = {0: (-1, 0), 1: (0, 1), 2: (1, 0), 3: (0, -1)}
-L, N, Q = map(int, input().split())
+L, N, Q = map(int, input().split()) # 보드 크기, 기사 수, 명령 수
 '''
 board 정보
 0: 빈칸
@@ -121,6 +121,9 @@ def knight_push(i, d, idx):
     knights[i] = [r, c, h, w, health]
     if health <= 0:
         knights_status[i] = 0
+        for x in range(r, r + h):
+            for y in range(c, c + w):
+                knight_board[x][y] = 0
 
 
 
