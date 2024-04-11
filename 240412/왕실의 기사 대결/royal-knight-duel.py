@@ -60,10 +60,9 @@ def knight_move(idx, d):
     # print(idx)
     if knights_status[idx]:
         stack = knight_push_check(idx, d, [idx])
-    # print(stack)
-    while stack:
-        k = stack.pop()
-        knight_push(k, d, idx)
+        while stack:
+            k = stack.pop()
+            knight_push(k, d, idx)
 
 def is_wall(x, y):
     if board[x][y] == 2:
