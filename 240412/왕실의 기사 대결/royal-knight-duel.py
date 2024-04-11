@@ -57,6 +57,7 @@ damages = [0 for _ in range(N + 1)]
 
 
 def knight_move(idx, d):
+    # print(idx)
     if knights_status[idx]:
         stack = knight_push_check(idx, d, [idx])
     # print(stack)
@@ -95,7 +96,7 @@ def knight_push_check(i, d, stack):
         if not knight_flag:
             return stack
         else:
-            return knight_push_check(k, d, stack)
+            return knight_push_check(stack[-1], d, stack)
     return []
 
 
@@ -137,6 +138,7 @@ for idx, di in queries:
     # print(*knight_board, sep='\n')
     # print(knights)
     # print()
+
 total_damage = 0
 for i in range(1, N + 1):
     if knights_status[i]:
