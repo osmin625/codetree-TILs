@@ -5,7 +5,7 @@ L x L 체스판
 '''
 
 dir_ = {0: (-1, 0), 1: (0, 1), 2: (1, 0), 3: (0, -1)}
-L, N, Q = map(int, input().split()) # 보드 크기, 기사 수, 명령 수
+L, N, Q = map(int, input().split())  # 보드 크기, 기사 수, 명령 수
 '''
 board 정보
 0: 빈칸
@@ -19,23 +19,27 @@ for _ in range(L):
     temp.append(2)
     board.append(temp)
 board.append([2] * (L + 2))
-knight_board = [[0 for _ in range(L + 2)] for _ in range(L + 2)]
 '''
 knights: 기사 정보, (r, c, h, w, k)
-(r c): 좌측 상단 좌표 
+(r c): 좌측 상단 좌표  
 h: 높이 
 w: 길이 
 k: 초기 체력
 '''
 knights = {}
+'''
+knights_status: 기사 상태
+0: 죽음
+1: 생존
+2: 밀쳐지는 기사 
+'''
 knights_status = {}
+
 for i in range(1, N + 1):
     r, c, h, w, health = list(map(int, input().split()))
     knights[i] = [r, c, h, w, health]
     knights_status[i] = 1
-    for x in range(r, r + h):
-        for y in range(c, c + w):
-            knight_board[x][y] = i
+wall_flag = False
 '''
 왕의 명령
 (i, d): i번 기사가 방향 d로 한 칸 이동하기. (기사가 없을 수도 있음)
@@ -57,12 +61,21 @@ damages = [0 for _ in range(N + 1)]
 
 
 def knight_move(idx, d):
-    # print(idx)
+    global wall_flag
+    # print(idx, d)
+    # print(knights)
+    # print(knights_status)
     if knights_status[idx]:
-        stack = knight_push_check(idx, d, [idx])
-        while stack:
-            k = stack.pop()
-            knight_push(k, d, idx)
+        knight_push_check(idx, d)
+        if not wall_flag:
+            knight_push(idx, d)
+        wall_flag = False
+        # print(knights_status)
+        for k in knights_status:
+            if knights_status[k] == 2:
+                knight_push(k, d)
+    # print()
+
 
 def is_wall(x, y):
     if board[x][y] == 2:
@@ -71,58 +84,59 @@ def is_wall(x, y):
 
 
 def is_knight(x, y):
-    return knight_board[x][y]
+    for idx, (r, c, h, w, _) in knights.items():
+        if r <= x < r + h and c <= y < c + w:
+            return idx
+    else:
+        return 0
 
 
-def knight_push_check(i, d, stack):
+def knight_push_check(i, d):
+    global wall_flag
     dx, dy = dir_[d]
+    next_ = []
     r, c, h, w, _ = knights[i]
-    knight_flag = False
     for x in range(r, r + h):
         for y in range(c, c + w):
-            if knight_board[x + dx][y + dy] == i: # 나라면
+            # print(x + dx, y + dy, is_knight(x + dx, y + dy))
+            if wall_flag:
+                break
+            elif r <= x + dx < r + h and c <= y + dy < c + w:  # 나라면
                 continue
             elif is_wall(x + dx, y + dy):  # 벽이라면
-                return []
-            elif k:= is_knight(x + dx, y + dy): # 기사라면
-                if k != stack[-1]:
-                    stack.append(k)
-                    knight_flag = True
+                wall_flag = True
+                return
+            elif k := is_knight(x + dx, y + dy):  # 기사라면
+                knights_status[k] = 2
+                next_.append(k)
             else:  # 벽도 아니고 기사도 아니라면
                 continue
-    if not knight_flag:
-        return stack
-    else:
-        return knight_push_check(stack[-1], d, stack)
 
+    for n in next_:
+        knight_push_check(n, d)
+    if wall_flag:
+        for n in next_:
+            knights_status[n] = 1
+        return
 
-def knight_push(i, d, idx):
+def knight_push(i, d):
     global damages
     damage = 0
     dx, dy = dir_[d]
     r, c, h, w, health = knights[i]
-    for x in range(r, r + h):
-        for y in range(c, c + w):
-            knight_board[x][y] = 0
     r, c = r + dx, c + dy
-    for x in range(r, r + h):
-        for y in range(c, c + w):
-            knight_board[x][y] = i
-            if board[x][y] == 1:
-                damage += 1
-    # print('knight_board')
-    # print(*knight_board, sep='\n')
-    if i != idx:
+
+    if knights_status[i] == 2:
+        knights_status[i] = 1
+        for x in range(r, r + h):
+            for y in range(c, c + w):
+                if board[x][y] == 1:
+                    damage += 1
         health -= damage
         damages[i] += damage
     knights[i] = [r, c, h, w, health]
     if health <= 0:
         knights_status[i] = 0
-        for x in range(r, r + h):
-            for y in range(c, c + w):
-                knight_board[x][y] = 0
-
-
 
 
 for idx, di in queries:
@@ -131,7 +145,6 @@ for idx, di in queries:
     # print('board')
     # print(*board, sep='\n')
     # print(idx, di)
-    # print(*knight_board, sep='\n')
     # print(knights)
     # print()
 
