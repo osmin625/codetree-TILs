@@ -81,11 +81,15 @@ def rotate(start, end, size):
     sx, sy = start
     ex, ey = end
     grid[gate[0]][gate[1]] = '.'
+    in_box_pos = []
     for i, (x, y) in get_alive_pos_items():
         # print(f'{sx} < {x} < {ex}, {sy} < {y} < {ey}')
         if sx <= x < ex and sy <= y < ey:
-            grid[x][y] = str(i)
+            # 참가자 두 명이 겹치는 경우 고려 불가.
+            in_box_pos.append(i)
     temp = [[0 for _ in range(size)] for _ in range(size)]
+    # print(start, end, size)
+    # print(*grid, sep='\n')
     for i in range(size):
         for j in range(size):
             # print(ex - j - 1, i + sy, grid[ex - j - 1][i + sy])
@@ -93,9 +97,11 @@ def rotate(start, end, size):
             if target == '.':
                 grid[gate[0]][gate[1]] = 0
                 gate = [sx + i, sy + j]
-            elif type(target) is str:
-                grid[ex - j - 1][i + sy] = 0
-                pos[int(target)] = [sx + i, sy + j]
+            elif target == 0:
+                for idx in in_box_pos:
+                    if [ex - j - 1, i + sy] == pos[idx]:
+                        pos[idx] = [sx + i, sy + j]
+                        in_box_pos.remove(idx)
             temp[i][j] = grid[ex - j - 1][i + sy]
 
     for i in range(size):
@@ -104,8 +110,9 @@ def rotate(start, end, size):
                 grid[sx + i][sy + j] = temp[i][j] - 1
             else:
                 grid[sx + i][sy + j] = temp[i][j]
-
-
+    grid[gate[0]][gate[1]] = '.'
+    # print(*grid, sep='\n')
+    grid[gate[0]][gate[1]] = 0
 def move_pos():
     global pos, pos_status
     for i, (x, y) in get_alive_pos_items():
