@@ -66,7 +66,8 @@ def get_pushed_knight(idx, d):
                     # 살아 있는 기사 k의 범위에 포함된다면
                     for k in get_alive_knight():
                         if r_[k] <= nx < r_[k] + h_[k] \
-                                and c_[k] <= ny < c_[k] + w_[k]:
+                                and c_[k] <= ny < c_[k] + w_[k]\
+                                and k not in q:
                             # knight와 q에 기사 추가
                             knights.append(k)
                             q.append(k)
@@ -80,10 +81,6 @@ def knight_wall_check(i, d):
         for y in range(c_[i], c_[i] + w_[i]):
             nx, ny = x + dx, y + dy
             # 기사의 이웃한 칸이
-            # print(i, d)
-            # print(r_[i], c_[i], h_[i], w_[i])
-            # print(nx, ny)
-            # print(x, y)
             if nx in [r_[i] - 1, r_[i] + h_[i]] \
                     or ny in [c_[i] - 1, c_[i] + w_[i]]:
                 # 벽이라면
@@ -120,6 +117,7 @@ for i, d in query:
     knight_wall_check(i, d)
     for k in knights:
         knight_wall_check(k, d)
+
     if not any(is_wall.values()):  # 벽이 없다면
         knight_attack(i, d)
         for k in knights:
@@ -128,5 +126,6 @@ for i, d in query:
         for i in range(1, N + 1):
             is_wall[i] = 0
 
+# print(damage)
 ans = [damage[i] for i in range(1, N + 1) if health[i] > 0]
 print(sum(ans))
