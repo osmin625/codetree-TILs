@@ -115,8 +115,9 @@ def knight_push_check(i, d):
     for n in next_:
         knight_push_check(n, d)
     if wall_flag:
-        for n in next_:
-            knights_status[n] = 1
+        for n in knights_status:
+            if knights_status[n] == 2:
+                knights_status[n] = 1
         return
 
 def knight_push(i, d):
