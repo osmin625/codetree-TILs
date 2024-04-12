@@ -80,7 +80,12 @@ def knight_wall_check(i, d):
         for y in range(c_[i], c_[i] + w_[i]):
             nx, ny = x + dx, y + dy
             # 기사의 이웃한 칸이
-            if r_[i] + h_[i] == nx or c_[i] + w_[i] == ny:
+            # print(i, d)
+            # print(r_[i], c_[i], h_[i], w_[i])
+            # print(nx, ny)
+            # print(x, y)
+            if nx in [r_[i] - 1, r_[i] + h_[i]] \
+                    or ny in [c_[i] - 1, c_[i] + w_[i]]:
                 # 벽이라면
                 if board[nx][ny] == 2:
                     is_wall[i] = 1
@@ -112,6 +117,7 @@ for i, d in query:
     # print(r_)
     # print(c_)
     # print()
+    knight_wall_check(i, d)
     for k in knights:
         knight_wall_check(k, d)
     if not any(is_wall.values()):  # 벽이 없다면
