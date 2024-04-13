@@ -41,6 +41,7 @@ def get_strongest_potab():
             if grid[i][j] > 0:  # 생존한 포탑 대상
                 cand.append((-grid[i][j], attack_log[i][j], (i + j), j, i))
     cand.sort()
+    # print(*cand, sep='\n')
     return (cand[0][-1], cand[0][-2])
 
 
@@ -146,13 +147,15 @@ for k in range(1, K + 1):
     if get_potab_alive() == 1:
         break
     wp = get_weakest_potab()
-    grid[wp[0]][wp[1]] += N + M
+    # print(wp)
     sp = get_strongest_potab()
+    # print(sp)
+    grid[wp[0]][wp[1]] += N + M
     attack_log[wp[0]][wp[1]] = k
     if not razer(wp, sp):
         potan(wp, sp)
     potab_dead()
     power_up(wp, sp)
-
+    # print(*grid, sep='\n')
 ax, ay = get_strongest_potab()
 print(grid[ax][ay])
