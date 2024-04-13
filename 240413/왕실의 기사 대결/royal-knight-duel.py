@@ -99,6 +99,7 @@ def knight_move(i, d):
     r_[i] += dx
     c_[i] += dy
     # 데미지 계산하기
+    damage[i] = 0
     for x in range(r_[i], r_[i] + h_[i]):
         for y in range(c_[i], c_[i] + w_[i]):
             if board[x][y] == 1:
@@ -112,8 +113,12 @@ def knight_attack(i, d):
     c_[i] += dy
 
 
+prev_health = health.copy()
 for i, d in query:
     # print('---', i, d)
+    # print(health)
+    if health[i] <= 0:
+        continue
     knights = get_pushed_knight(i, d)
     # print(knights)
     # print(r_)
@@ -133,19 +138,19 @@ for i, d in query:
 
 # print(damage)
 # print(health)
-ans = [damage[i] for i in range(1, N + 1) if health[i] > 0]
+ans = [prev_health[i] - health[i] for i in range(1, N + 1) if health[i] > 0]
 print(sum(ans))
 
 '''
-4 4 8
-0 0 0 0
-0 0 0 0
+4 4 19
+1 0 0 0
+1 0 0 0
 0 2 0 0
-0 1 0 0
+1 1 0 0
 3 1 2 1 10
 1 2 2 1 10
 1 3 1 1 10
-4 2 1 2 10
+4 2 1 2 1
 1 0
 1 0
 1 1
@@ -154,4 +159,64 @@ print(sum(ans))
 2 1
 2 2
 2 3
+2 0
+2 0
+2 1
+2 3
+1 2
+2 1
+2 2
+3 3
+3 3
+3 3
+3 2
+
+4 3 11 
+2 0 0 1
+0 0 2 0
+0 2 0 0
+1 1 0 2
+4 1 1 1 10
+1 3 1 1 1
+4 2 1 1 10
+1 0
+1 0
+1 1
+1 0
+1 1
+1 1
+1 2
+1 2
+1 3
+1 2
+1 3
+
+
+5 6 1
+0 0 0 0 1
+0 0 0 0 1
+0 0 0 0 1
+0 0 0 0 1
+0 0 0 2 1
+2 1 2 1 10
+1 2 2 1 10
+1 3 2 1 10
+3 2 2 1 10
+4 3 2 1 10
+2 4 2 1 10
+1 1
+
+4 6 2
+1 0 0 1
+1 0 0 1
+1 0 0 1
+1 0 0 1
+1 1 4 1 10
+1 2 1 1 10
+1 3 1 1 1
+2 3 1 1 10
+3 3 1 1 10
+4 3 1 1 10
+1 1
+3 3
 '''
