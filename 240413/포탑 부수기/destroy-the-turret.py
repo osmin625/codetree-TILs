@@ -55,7 +55,6 @@ def razer(weak, strong):
     '''
     wx, wy = weak
     sx, sy = strong
-    path = []
     q = deque([weak])
     trace_back = [[0 for _ in range(M)] for _ in range(N)]
     visited = [[0 for _ in range(M)] for _ in range(N)]
@@ -78,10 +77,12 @@ def razer(weak, strong):
                     trace_back[nx][ny] = (x, y)
                     q.append((nx, ny))
     if can_attack:
+        # print('back')
+        # print(*trace_back, sep='\n')
+        # print('---')
         grid[sx][sy] -= grid[wx][wy]  # 도착지 피해량
         cx, cy = sx, sy
         while True:
-            # print(cx, cy)
             cx, cy = trace_back[cx][cy]
             if (cx, cy) == (wx, wy):
                 break
@@ -108,7 +109,7 @@ def potan(weak, strong):
         if ny < 0:
             ny += M
         nx, ny = nx % N, ny % M
-        if grid[nx][ny] > 0:
+        if grid[nx][ny] > 0 and (nx, ny) != (wx, wy):
             grid[nx][ny] -= grid[wx][wy] // 2
             damaged[nx][ny] = 1
 
@@ -143,20 +144,37 @@ grid = [list(map(int, input().split())) for _ in range(N)]
 attack_log = [[0 for _ in range(M)] for _ in range(N)]
 
 for k in range(1, K + 1):
+    # print(k)
     damaged = [[0 for _ in range(M)] for _ in range(N)]
     # 부서지지 않은 포탑 1 개일 때 즉시 종료.
     if get_potab_alive() == 1:
         break
     wp = get_weakest_potab()
-    # print(wp)
     sp = get_strongest_potab()
-    # print(sp)
     grid[wp[0]][wp[1]] += N + M
+    # print('weak', wp, grid[wp[0]][wp[1]])
+    # print('strong', sp)
+
     attack_log[wp[0]][wp[1]] = k
     if not razer(wp, sp):
         potan(wp, sp)
     # potab_dead()
     power_up(wp, sp)
     # print(*grid, sep='\n')
+    # print('--------')
 ax, ay = get_strongest_potab()
 print(grid[ax][ay])
+
+'''
+4 4 100
+10 0 0 50
+0 0 0 0
+0 0 50 50
+50 0 50 90
+
+4 4 100
+1 50 0 0
+50 50 0 0
+0 0 50 50
+0 0 50 1000
+'''
