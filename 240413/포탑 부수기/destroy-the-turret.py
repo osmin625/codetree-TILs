@@ -10,6 +10,7 @@ N x M 격자
 가장 약한 포탑 선택 -> 공격력 N + M만큼 증가
 '''
 from heapq import heapify
+from collections import deque
 dir_ = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # 우 하 좌 상
 bomb_ = [(-1, -1), (-1, 0), (-1, 1),
          (0, -1), (0, 1),
@@ -55,18 +56,15 @@ def razer(weak, strong):
     wx, wy = weak
     sx, sy = strong
     path = []
-    stack = []
+    q = deque([weak])
+    trace_back = [[0 for _ in range(M)] for _ in range(N)]
     visited = [[0 for _ in range(M)] for _ in range(N)]
-
-    def dfs(pos):
-        nonlocal path, stack
-        x, y = pos
-        if path and len(stack) > len(path):
-            return
-        if pos == strong:
-            if not path or len(stack) < len(path):
-                path = stack.copy()
-            return
+    can_attack = False
+    while q:
+        x, y = q.popleft()
+        if (x, y) == (sx, sy):
+            can_attack = True
+            break
         for dx, dy in dir_:
             nx, ny = x + dx, y + dy
             if nx < 0:
@@ -77,21 +75,21 @@ def razer(weak, strong):
             if not visited[nx][ny]:
                 if grid[nx][ny] > 0:
                     visited[nx][ny] = 1
-                    stack.append((nx, ny))
-                    dfs((nx, ny))
-                    stack.pop()
-                    visited[nx][ny] = 0
-        return
-
-    dfs(weak)
-    if not path:
+                    trace_back[nx][ny] = (x, y)
+                    q.append((nx, ny))
+    if can_attack:
+        grid[sx][sy] -= grid[wx][wy]  # 도착지 피해량
+        cx, cy = sx, sy
+        while True:
+            # print(cx, cy)
+            cx, cy = trace_back[cx][cy]
+            if (cx, cy) == (wx, wy):
+                break
+            grid[cx][cy] -= grid[wx][wy] // 2  # 경유지 피해량
+            damaged[cx][cy] = 1  # 피해 입은 좌표들
+        return True
+    else:
         return False
-    path.pop()  # 도착지 제거
-    grid[sx][sy] -= grid[wx][wy]  # 도착지 피해량
-    for px, py in path:
-        grid[px][py] -= grid[wx][wy] // 2  # 경유지 피해량
-        damaged[px][py] = 1  # 피해 입은 좌표들
-    return True
 
 
 def potan(weak, strong):
