@@ -9,6 +9,7 @@ N x M 격자
 매 턴
 가장 약한 포탑 선택 -> 공격력 N + M만큼 증가
 '''
+from heapq import heapify
 dir_ = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # 우 하 좌 상
 bomb_ = [(-1, -1), (-1, 0), (-1, 1),
          (0, -1), (0, 1),
@@ -28,7 +29,7 @@ def get_weakest_potab():
         for j in range(M):
             if grid[i][j] > 0:  # 생존한 포탑 대상
                 cand.append((grid[i][j], -attack_log[i][j], -(i + j), -j, i, j))
-    cand.sort()
+    heapify(cand)
     return (cand[0][-2:])
 
 
@@ -40,7 +41,7 @@ def get_strongest_potab():
         for j in range(M):
             if grid[i][j] > 0:  # 생존한 포탑 대상
                 cand.append((-grid[i][j], attack_log[i][j], (i + j), j, i))
-    cand.sort()
+    heapify(cand)
     # print(*cand, sep='\n')
     return (cand[0][-1], cand[0][-2])
 
@@ -60,6 +61,8 @@ def razer(weak, strong):
     def dfs(pos):
         nonlocal path, stack
         x, y = pos
+        if path and len(stack) > len(path):
+            return
         if pos == strong:
             if not path or len(stack) < len(path):
                 path = stack.copy()
@@ -154,7 +157,7 @@ for k in range(1, K + 1):
     attack_log[wp[0]][wp[1]] = k
     if not razer(wp, sp):
         potan(wp, sp)
-    potab_dead()
+    # potab_dead()
     power_up(wp, sp)
     # print(*grid, sep='\n')
 ax, ay = get_strongest_potab()
